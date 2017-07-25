@@ -4,16 +4,13 @@ import com.google.common.primitives.Doubles;
 import org.librairy.boot.model.Event;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
-import org.librairy.linker.jsd.data.Shape;
-import org.librairy.linker.jsd.data.ShapeDao;
-import org.librairy.linker.jsd.data.Similarity;
-import org.librairy.linker.jsd.data.SimilarityDao;
+import org.librairy.linker.jsd.data.*;
 import org.librairy.linker.jsd.util.Worker;
-import org.librairy.metrics.distance.JensenShannonDivergence;
 import org.librairy.metrics.similarity.JensenShannonSimilarity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -26,12 +23,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
 @Component
-public class SimilarityService {
+public class NaiveSimilarityService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SimilarityService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NaiveSimilarityService.class);
 
     @Autowired
     Worker worker;
+
+    @Autowired
+    ShapeCache shapeCache;
 
     @Autowired
     ShapeDao shapeDao;
@@ -42,6 +42,9 @@ public class SimilarityService {
     @Autowired
     EventBus eventBus;
 
+    @Value("#{environment['LIBRAIRY_JSD_SCORE_MIN']?:${librairy.jsd.score.min}}")
+    Double minScore;
+
     public void handleParallel(String resourceUri, String domainUri){
         worker.run(() -> handle(resourceUri, domainUri));
     }
@@ -49,6 +52,7 @@ public class SimilarityService {
     public void handle(String resourceUri, String domainUri){
 
         // Get reference shape
+        LOG.info("Calculating similarities for '" + resourceUri + "' in '" + domainUri + "' ...");
 
         Instant start = Instant.now();
         Optional<Shape> refShape = shapeDao.get(domainUri, resourceUri);
@@ -62,21 +66,23 @@ public class SimilarityService {
 
         double[] refVector = Doubles.toArray(refShape.get().getVector());
 
-        Integer size = 100;
-        Optional<Long> offset = Optional.empty();
 
         AtomicInteger counter = new AtomicInteger();
+        QueryKey query = new QueryKey();
+        query.setDomainUri(domainUri);
+        query.setSize(2500);
+        query.setOffset(Optional.empty());
         while(true){
 
-            List<Shape> shapes = shapeDao.get(domainUri, size, offset);
+            List<Shape> shapes = shapeCache.get(query);
 
-            shapes.parallelStream().forEach( shape -> {
+            shapes.stream().forEach( shape -> {
 
                 if (shape.getUri().equalsIgnoreCase(resourceUri)) return;
 
                 double score = JensenShannonSimilarity.apply(refVector, Doubles.toArray(shape.getVector()));
 
-                if (score >= 0.5){
+                if (score >= minScore){
                     Similarity similarity = new Similarity();
                     similarity.setScore(score);
                     similarity.setUri1(resourceUri);
@@ -88,9 +94,9 @@ public class SimilarityService {
             });
 
 
-            if (shapes.size() < size) break;
+            if (shapes.size() < query.getSize()) break;
 
-            offset = Optional.of(shapes.get(size-1).getId());
+            query.setOffset(Optional.of(shapes.get(query.getSize()-1).getId()));
 
         }
 

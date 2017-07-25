@@ -2,12 +2,12 @@ package org.librairy.linker.jsd.eventbus;
 
 import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.relations.Relation;
-import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.EventBusSubscriber;
 import org.librairy.boot.model.modules.RoutingKey;
-import org.librairy.linker.jsd.service.SimilarityService;
+import org.librairy.linker.jsd.data.ShapeCache;
+import org.librairy.linker.jsd.service.NaiveSimilarityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,10 @@ public class ShapeCreatedEventHandler implements EventBusSubscriber {
     private static final Logger LOG = LoggerFactory.getLogger(ShapeCreatedEventHandler.class);
 
     @Autowired
-    SimilarityService service;
+    NaiveSimilarityService service;
+
+    @Autowired
+    ShapeCache cache;
 
     @Autowired
     protected EventBus eventBus;
@@ -42,6 +45,7 @@ public class ShapeCreatedEventHandler implements EventBusSubscriber {
     public void handle(Event event) {
         LOG.debug("event received: " + event);
         try{
+            cache.refresh();
             Relation relation = event.to(Relation.class);
             String resourceUri  = relation.getStartUri();
             String domainUri    = relation.getEndUri();

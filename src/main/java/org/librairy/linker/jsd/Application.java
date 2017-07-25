@@ -17,7 +17,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @SpringBootApplication
 @ComponentScan({"org.librairy"})
-@PropertySource({"classpath:boot.properties"})
+@PropertySource({"classpath:boot.properties","classpath:computing.properties"})
 public class Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);

@@ -77,6 +77,14 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>librairy-computing-repo</id>
+            <url>https://raw.github.com/librairy/computing/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
 
     </repositories>
 
@@ -93,10 +101,14 @@
         <project.java.version>1.8</project.java.version>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
+        <maven.scala.version>2.15.2</maven.scala.version>
 
         <librairy.boot.version>1.8.0</librairy.boot.version>
+        <librairy.computing.version>1.1</librairy.computing.version>
         <librairy.metrics.version>1.18</librairy.metrics.version>
         <junit.version>4.12</junit.version>
+        <scala.version>2.10.5</scala.version>
+        <scalatest.version>2.2.4</scalatest.version>
         <testutils.version>1.0.0</testutils.version>
     </properties>
 
@@ -129,6 +141,34 @@
                 <groupId>org.librairy</groupId>
                 <artifactId>librairy-metrics</artifactId>
                 <version>${librairy.metrics.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.librairy</groupId>
+                <artifactId>librairy-computing</artifactId>
+                <version>${librairy.computing.version}</version>
+            </dependency>
+
+            <!-- Scala Version -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scalap</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
             </dependency>
 
             <!-- Unit tests Libraries -->
@@ -192,6 +232,26 @@
             </exclusions>
         </dependency>
 
+        <!-- Distributed Computing -->
+        <dependency>
+            <groupId>org.librairy</groupId>
+            <artifactId>librairy-computing</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- Unit tests Libraries -->
         <dependency>
             <groupId>junit</groupId>
@@ -227,11 +287,46 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- TEST: Scala -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.10</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging-slf4j_2.10</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
         <finalName>linker-jsd</finalName>
         <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>${maven.scala.version}</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <args>
+                                <arg>-dependencyfile</arg>
+                                <arg>${project.build.directory}/.scala_dependencies</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
