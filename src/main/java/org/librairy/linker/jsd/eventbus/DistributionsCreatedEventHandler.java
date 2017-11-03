@@ -6,10 +6,12 @@ import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.EventBusSubscriber;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.linker.jsd.data.ShapeCache;
+import org.librairy.linker.jsd.service.EfficientClusterBasedSimilarityService;
 import org.librairy.linker.jsd.service.RecursiveKMeansSimilarityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,12 +20,16 @@ import javax.annotation.PostConstruct;
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
 @Component
+@DependsOn("dbChecker")
 public class DistributionsCreatedEventHandler implements EventBusSubscriber {
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributionsCreatedEventHandler.class);
 
+//    @Autowired
+//    RecursiveKMeansSimilarityService service;
+
     @Autowired
-    RecursiveKMeansSimilarityService service;
+    EfficientClusterBasedSimilarityService service;
 
     @Autowired
     ShapeCache cache;
@@ -46,7 +52,9 @@ public class DistributionsCreatedEventHandler implements EventBusSubscriber {
         try{
             String domainUri = event.to(String.class);
 
-            service.handle(domainUri);
+            Thread.sleep(30000);
+
+            service.handleParallel(domainUri);
 
         } catch (Exception e){
             // TODO Notify to event-bus when source has not been added

@@ -13,7 +13,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.librairy:librairy-boot:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.librairy:librairy-boot:1.8.3" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.16" level="project" />
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.3" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
@@ -202,7 +202,7 @@
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.7" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.2.7" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.2.7" level="project" />
-    <orderEntry type="library" name="Maven: org.librairy:librairy-computing:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.librairy:librairy-computing:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.datastax.spark:spark-cassandra-connector_2.10:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.cassandra:cassandra-clientutil:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.joda:joda-convert:1.2" level="project" />

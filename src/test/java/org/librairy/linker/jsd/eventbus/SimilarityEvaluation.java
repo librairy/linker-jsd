@@ -43,14 +43,14 @@ public class SimilarityEvaluation {
     @Autowired
     RecursiveKMeansSimilarityService service;
 
-    String domainUri = "http://librairy.linkeddata.es/resources/domains/jows";
+    String domainUri = "http://librairy.linkeddata.es/resources/domains/blueBottle";
 
     @Test
     public void evaluateSimilarities(){
 
-        Integer numItems = 5000 ;
+        Integer numItems = 100 ;
         Optional<Double> minScore = Optional.of(0.9);
-        Optional<Integer> maxNumber = Optional.of(10);
+        Optional<Integer> maxNumber = Optional.of(3);
 
         List<Double> intersections = new ArrayList<>();
 
