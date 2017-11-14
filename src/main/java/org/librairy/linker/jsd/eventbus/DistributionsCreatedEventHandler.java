@@ -5,9 +5,10 @@ import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.EventBusSubscriber;
 import org.librairy.boot.model.modules.RoutingKey;
+import org.librairy.linker.jsd.cache.DelayCache;
 import org.librairy.linker.jsd.data.ShapeCache;
-import org.librairy.linker.jsd.service.EfficientClusterBasedSimilarityService;
-import org.librairy.linker.jsd.service.RecursiveKMeansSimilarityService;
+import org.librairy.linker.jsd.service.SimilarityService;
+import org.librairy.linker.jsd.tasks.SimilarityTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,11 @@ public class DistributionsCreatedEventHandler implements EventBusSubscriber {
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributionsCreatedEventHandler.class);
 
-//    @Autowired
-//    RecursiveKMeansSimilarityService service;
+    @Autowired
+    SimilarityService similarityService;
 
     @Autowired
-    EfficientClusterBasedSimilarityService service;
-
-    @Autowired
-    ShapeCache cache;
+    DelayCache delayCache;
 
     @Autowired
     protected EventBus eventBus;
@@ -52,9 +50,12 @@ public class DistributionsCreatedEventHandler implements EventBusSubscriber {
         try{
             String domainUri = event.to(String.class);
 
-            Thread.sleep(30000);
+            Long delay = delayCache.getDelay(domainUri);
 
-            service.handleParallel(domainUri);
+            LOG.info("Waiting for domain delay: " + delay + " ..");
+            Thread.sleep(delay);
+
+            similarityService.process(domainUri);
 
         } catch (Exception e){
             // TODO Notify to event-bus when source has not been added

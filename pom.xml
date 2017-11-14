@@ -11,7 +11,7 @@
 
 	<groupId>org.librairy</groupId>
     <artifactId>librairy-linker-jsd</artifactId>
-    <version>1.8.3.3</version>
+    <version>1.8.6</version>
     <packaging>jar</packaging>
     <name>linker-jsd</name>
     <description>calculate distances between Dirichlet distributions based on Jensen-Shannon Divergence</description>
@@ -103,7 +103,7 @@
         <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
         <maven.scala.version>2.15.2</maven.scala.version>
 
-        <librairy.boot.version>1.8.3</librairy.boot.version>
+        <librairy.boot.version>1.8.5.2</librairy.boot.version>
         <librairy.computing.version>1.1.1</librairy.computing.version>
         <librairy.metrics.version>1.18</librairy.metrics.version>
         <junit.version>4.12</junit.version>

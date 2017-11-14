@@ -52,6 +52,12 @@ public class DirichletDistribution implements Serializable {
         this.label = getSortedTopics(threshold);
     }
 
+    public DirichletDistribution(String id, List<Double> vector, Integer topTopics){
+        this.id = id;
+        this.vector = vector;
+        this.label = getSortedTopics(topTopics);
+    }
+
     @JsonIgnore
     public Integer getHighestTopic(){
         return IntStream.range(0,vector.size())
@@ -68,12 +74,13 @@ public class DirichletDistribution implements Serializable {
 
     @JsonIgnore
     public String getSortedTopics(Integer top){
+        Integer maxTopics = Math.min(top,vector.size());
         return IntStream
                 .range(0,vector.size())
                 .mapToObj(i -> new Tuple2<Integer,Double>(i,vector.get(i)))
                 .sorted( (a,b) -> -a._2.compareTo(b._2))
                 .map( t -> String.valueOf(t._1))
-                .limit(top)
+                .limit(maxTopics)
                 .collect(Collectors.joining("|"));
     }
 

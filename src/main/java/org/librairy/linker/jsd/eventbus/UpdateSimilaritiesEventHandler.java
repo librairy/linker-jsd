@@ -23,27 +23,21 @@ import javax.annotation.PostConstruct;
  */
 @Component
 @DependsOn("dbChecker")
-public class ShapeCreatedEventHandler implements EventBusSubscriber {
+public class UpdateSimilaritiesEventHandler implements EventBusSubscriber {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ShapeCreatedEventHandler.class);
-
-    @Autowired
-    SimilarityService similarityService;
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateSimilaritiesEventHandler.class);
 
     @Autowired
-    ShapeCache cache;
+    NaiveSimilarityService naiveSimilarityService;
 
     @Autowired
     protected EventBus eventBus;
 
-    @Autowired
-    DelayCache delayCache;
-
     @PostConstruct
     public void init(){
-        RoutingKey routingKey = RoutingKey.of("shape.created");
+        RoutingKey routingKey = RoutingKey.of("domain.update.relations.similarity");
         LOG.info("Trying to register as subscriber of '" + routingKey + "' events ..");
-        eventBus.subscribe(this, BindingKey.of(routingKey, "linker.jsd.shape.created"));
+        eventBus.subscribe(this, BindingKey.of(routingKey, "linker.jsd.similarity.requested"));
         LOG.info("registered successfully");
     }
 
@@ -52,14 +46,14 @@ public class ShapeCreatedEventHandler implements EventBusSubscriber {
     public void handle(Event event) {
         LOG.debug("event received: " + event);
         try{
-            cache.refresh();
+
             Relation relation = event.to(Relation.class);
-            String resourceUri  = relation.getStartUri();
-            String domainUri    = relation.getEndUri();
+            String domainUri    = relation.getStartUri();
+            String resourceUri  = relation.getEndUri();
+            Double minScore     = relation.getWeight();
 
-            Long delay = delayCache.getDelay(domainUri);
 
-            similarityService.process(domainUri, resourceUri, delay);
+            naiveSimilarityService.handle(resourceUri, domainUri, minScore);
 
             LOG.debug("ACK sent!! [" + resourceUri+"]");
         } catch (RuntimeException e){

@@ -41,15 +41,14 @@ public class EventSimulator {
         Relation relation = new Relation();
 
         List<String> items = Arrays.asList(new String[]{
-                "M57xA96F4Ix",
-                "8M7y-P3tR0UZL",
-                "ww_16zMtRVs8L",
-                "yw-16zda6VaLK"
+                "2-s2.0-71249116642",
+                "2-s2.0-71249093127",
+                "2-s2.0-71249089662"
         });
 
         for(String item : items){
             relation.setStartUri("http://librairy.linkeddata.es/resources/items/"+item); //resource uri
-            relation.setEndUri("http://librairy.linkeddata.es/resources/domains/blueBottle"); // domainUri
+            relation.setEndUri("http://librairy.linkeddata.es/resources/domains/pc"); // domainUri
 
             eventBus.post(Event.from(relation), RoutingKey.of("shape.created"));
 
@@ -63,7 +62,7 @@ public class EventSimulator {
     @Test
     public void domainSimilarity() throws InterruptedException {
 
-        String domainUri = "http://librairy.linkeddata.es/resources/domains/blueBottle";
+        String domainUri = "http://librairy.linkeddata.es/resources/domains/pc";
 
         eventBus.post(Event.from(domainUri), RoutingKey.of("lda.distributions.created"));
         System.out.println("Event published!");

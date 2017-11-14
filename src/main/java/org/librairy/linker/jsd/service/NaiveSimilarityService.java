@@ -42,17 +42,12 @@ public class NaiveSimilarityService {
     @Autowired
     EventBus eventBus;
 
-    @Value("#{environment['LIBRAIRY_JSD_SCORE_MIN']?:${librairy.jsd.score.min}}")
-    Double minScore;
 
-    public void handleParallel(String resourceUri, String domainUri){
-        worker.run(() -> handle(resourceUri, domainUri));
-    }
 
-    public void handle(String resourceUri, String domainUri){
+    public void handle(String resourceUri, String domainUri, Double minScore){
 
         // Get reference shape
-        LOG.info("Calculating similarities for '" + resourceUri + "' in '" + domainUri + "' ...");
+        LOG.info("Calculating similarities for '" + resourceUri + "' in '" + domainUri + "' upper than " + minScore + "...");
 
         Instant start = Instant.now();
         Optional<Shape> refShape = shapeDao.get(domainUri, resourceUri);
@@ -70,7 +65,7 @@ public class NaiveSimilarityService {
         AtomicInteger counter = new AtomicInteger();
         QueryKey query = new QueryKey();
         query.setDomainUri(domainUri);
-        query.setSize(2500);
+        query.setSize(500);
         query.setOffset(Optional.empty());
         while(true){
 
